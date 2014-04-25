@@ -59,7 +59,7 @@ JSHinter.prototype.processErrors = function (file, errors) {
 
 JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
   if (errors) {
-    errors = "\\n" + errors.replace(/\n/gi, "\\n");
+    errors = "\\n" + this.escapeErrorString(errors);
   } else {
     errors = ""
   }
@@ -91,6 +91,13 @@ JSHinter.prototype.stripComments = function(string) {
 
   string = string.replace(/\/\*(?:(?!\*\/)[\s\S])*\*\//g, "");
   string = string.replace(/\/\/[^\n\r]*/g, ""); // Everything after '//'
+
+  return string;
+};
+
+JSHinter.prototype.escapeErrorString = function(string) {
+  string = string.replace(/\n/gi, "\\n");
+  string = string.replace(/'/gi, "\\'");
 
   return string;
 };

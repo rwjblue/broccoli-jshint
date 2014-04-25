@@ -113,6 +113,26 @@ describe('broccoli-jshint', function(){
       });
     });
 
+    it('calls escapeErrorString on the error string provided', function() {
+      var escapeErrorStringCalled = false;
+
+      var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
+      var tree = jshintTree(sourcePath, {
+        logError: function(message) { loggerOutput.push(message) },
+        escapeErrorString: function(string) {
+          escapeErrorStringCalled = true;
+
+          return "blazhorz";
+        }
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(dir) {
+        expect(escapeErrorStringCalled).to.be.ok();
+        expect(readFile(dir + '/core.jshint.js')).to.match(/blazhorz/)
+      });
+    });
+
     it('does not generate tests if disableTestGenerator is set', function(){
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var tree = jshintTree(sourcePath, {
@@ -126,6 +146,20 @@ describe('broccoli-jshint', function(){
 
         expect(readFile(dir + '/look-no-errors.jshint.js')).to.not.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
       });
+    });
+  });
+
+  describe('escapeErrorString', function() {
+    var tree;
+
+    beforeEach(function() {
+      tree = jshintTree('.', {
+        logError: function(message) { loggerOutput.push(message) }
+      });
+    });
+
+    it('escapes single quotes properly', function() {
+      expect(tree.escapeErrorString("'something'")).to.equal('\\\'something\\\'');
     });
   });
 });
