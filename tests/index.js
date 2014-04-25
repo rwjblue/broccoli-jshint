@@ -3,6 +3,7 @@
 var path = require('path');
 var jshintTree = require('..');
 var expect = require('expect.js');
+var rimraf = require('rimraf');
 var root = process.cwd();
 
 var fs = require('fs');
@@ -17,8 +18,15 @@ describe('broccoli-jshint', function(){
     return fs.readFileSync(path, {encoding: 'utf8'});
   }
 
+  function chdir(path) {
+    process.chdir(path);
+    if (!fs.existsSync('tmp')) {
+      fs.mkdirSync('tmp');  // this works around a bug in `quick-temp`
+    }
+  }
+
   beforeEach(function() {
-    process.chdir(root);
+    chdir(root);
 
     loggerOutput = [];
   });
@@ -27,12 +35,13 @@ describe('broccoli-jshint', function(){
     if (builder) {
       builder.cleanup();
     }
+    rimraf.sync(path.join(process.cwd(), 'tmp'));
   });
 
   describe('jshintrc', function() {
     it('uses the jshintrc as configuration for hinting', function(){
       var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
-      process.chdir(sourcePath);
+      chdir(sourcePath);
 
       var tree = jshintTree('.', {
         logError: function(message) { loggerOutput.push(message) }
@@ -47,7 +56,7 @@ describe('broccoli-jshint', function(){
 
     it('can handle jshintrc if it has comments', function(){
       var sourcePath = 'tests/fixtures/comments-in-jshintrc';
-      process.chdir(sourcePath);
+      chdir(sourcePath);
 
       var tree = jshintTree('.', {
         logError: function(message) { loggerOutput.push(message) }
