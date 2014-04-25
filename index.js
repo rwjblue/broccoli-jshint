@@ -1,7 +1,7 @@
 var fs     = require('fs');
 var path   = require('path');
 var chalk  = require('chalk');
-var findup = require('findup');
+var findup = require('findup-sync');
 var JSHINT = require('jshint').JSHINT;
 var Filter = require('broccoli-filter');
 
@@ -77,17 +77,22 @@ JSHinter.prototype.logError = function(message, color) {
 };
 
 JSHinter.prototype.getConfig = function() {
-  var jshintrcPath;
+  var jshintrcPath = findup('.jshintrc');
 
-  try {
-    jshintrcPath = findup.sync(process.cwd(), '.jshintrc');
-    var config = fs.readFileSync(path.join(jshintrcPath, '.jshintrc'), {encoding: 'utf8'});
+  if (jshintrcPath) {
+    var config = fs.readFileSync(jshintrcPath, {encoding: 'utf8'});
 
-    return JSON.parse(config);
-  } catch(e) {
-    // do nothing, let JSHINT use defaults
-    return;
+    return JSON.parse(this.stripComments(config));
   }
+};
+
+JSHinter.prototype.stripComments = function(string) {
+  string = string || "";
+
+  string = string.replace(/\/\*(?:(?!\*\/)[\s\S])*\*\//g, "");
+  string = string.replace(/\/\/[^\n\r]*/g, ""); // Everything after '//'
+
+  return string;
 };
 
 module.exports = JSHinter;

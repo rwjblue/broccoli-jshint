@@ -44,6 +44,20 @@ describe('broccoli-jshint', function(){
         expect(loggerOutput[0]).to.not.match(/Missing semicolon./)
       });
     });
+
+    it('can handle jshintrc if it has comments', function(){
+      var sourcePath = 'tests/fixtures/comments-in-jshintrc';
+      process.chdir(sourcePath);
+
+      var tree = jshintTree('.', {
+        logError: function(message) { loggerOutput.push(message) }
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(dir) {
+        expect(loggerOutput.length).to.eql(0);
+      });
+    });
   });
 
   describe('logError', function() {
