@@ -20,9 +20,6 @@ describe('broccoli-jshint', function(){
 
   function chdir(path) {
     process.chdir(path);
-    if (!fs.existsSync('tmp')) {
-      fs.mkdirSync('tmp');  // this works around a bug in `quick-temp`
-    }
   }
 
   beforeEach(function() {
@@ -35,7 +32,6 @@ describe('broccoli-jshint', function(){
     if (builder) {
       builder.cleanup();
     }
-    rimraf.sync(path.join(process.cwd(), 'tmp'));
   });
 
   describe('jshintrc', function() {
