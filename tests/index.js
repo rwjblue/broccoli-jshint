@@ -31,36 +31,36 @@ describe('broccoli-jshint', function(){
     }
   });
 
-  describe('jshintrc', function() {
-    it('uses the jshintrc as configuration for hinting', function(){
-      var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
-      process.chdir(sourcePath);
-
-      var tree = jshintTree('.', {
-        logError: function(message) { loggerOutput.push(message) }
-      });
-
-      builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
-
-        expect(loggerOutput[0]).to.not.match(/Missing semicolon./)
-      });
-    });
-
-    it('can handle jshintrc if it has comments', function(){
-      var sourcePath = 'tests/fixtures/comments-in-jshintrc';
-      process.chdir(sourcePath);
-
-      var tree = jshintTree('.', {
-        logError: function(message) { loggerOutput.push(message) }
-      });
-
-      builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
-        expect(loggerOutput.length).to.eql(0);
-      });
-    });
-  });
+//  describe('jshintrc', function() {
+//    it('uses the jshintrc as configuration for hinting', function(){
+//      var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
+//      process.chdir(sourcePath);
+//
+//      var tree = jshintTree('.', {
+//        logError: function(message) { loggerOutput.push(message) }
+//      });
+//
+//      builder = new broccoli.Builder(tree);
+//      return builder.build().then(function(dir) {
+//
+//        expect(loggerOutput[0]).to.not.match(/Missing semicolon./)
+//      });
+//    });
+//
+//    it('can handle jshintrc if it has comments', function(){
+//      var sourcePath = 'tests/fixtures/comments-in-jshintrc';
+//      process.chdir(sourcePath);
+//
+//      var tree = jshintTree('.', {
+//        logError: function(message) { loggerOutput.push(message) }
+//      });
+//
+//      builder = new broccoli.Builder(tree);
+//      return builder.build().then(function(dir) {
+//        expect(loggerOutput.length).to.eql(0);
+//      });
+//    });
+//  });
 
   describe('logError', function() {
     it('logs errors using custom supplied function', function(){
