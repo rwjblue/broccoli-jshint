@@ -3,7 +3,6 @@
 var path = require('path');
 var jshintTree = require('..');
 var expect = require('expect.js');
-var mkdirp = require('mkdirp');
 var root = process.cwd();
 
 var fs = require('fs');
