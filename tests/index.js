@@ -18,6 +18,7 @@ describe('broccoli-jshint', function(){
   }
 
   beforeEach(function() {
+    console.log('Root was: ' + process.cwd());
     console.log('Changing root to: ' + root);
     process.chdir(root);
 
