@@ -70,5 +70,20 @@ describe('broccoli-jshint', function(){
         expect(readFile(dir + '/look-no-errors.jshint.js')).to.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
       });
     });
+
+    it('does not generate tests if disableTestGenerator is set', function(){
+      var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
+      var tree = jshintTree(sourcePath, {
+        logError: function(message) { loggerOutput.push(message) },
+        disableTestGenerator: true
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(dir) {
+        expect(readFile(dir + '/core.jshint.js')).to.not.match(/Missing semicolon./)
+
+        expect(readFile(dir + '/look-no-errors.jshint.js')).to.not.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
+      });
+    });
   });
 });

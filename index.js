@@ -32,7 +32,9 @@ JSHinter.prototype.processString = function (content, relativePath) {
     this.logError(errors);
   }
 
-  return this.testGenerator(relativePath, passed, errors);
+  if (!this.disableTestGenerator) {
+    return this.testGenerator(relativePath, passed, errors);
+  }
 };
 
 JSHinter.prototype.processErrors = function (file, errors) {

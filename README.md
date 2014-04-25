@@ -27,6 +27,14 @@ Default: **true**
 
 ---
 
+`options.disableTestGenerator` *{true|false}*
+
+If `true` no tests will not be generated.
+
+Default: **false**
+
+---
+
 `options.testGenerator` *{Function}*
 
 The function used to generate test modules. You can provide a custom function for your client side testing framework of choice.
