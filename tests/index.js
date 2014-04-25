@@ -18,6 +18,8 @@ describe('broccoli-jshint', function(){
   }
 
   beforeEach(function() {
+    process.chdir(root);
+
     loggerOutput = [];
   });
 
@@ -25,6 +27,23 @@ describe('broccoli-jshint', function(){
     if (builder) {
       builder.cleanup();
     }
+  });
+
+  describe('jshintrc', function() {
+    it('uses the jshintrc as configuration for hinting', function(){
+      var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
+      process.chdir(sourcePath);
+
+      var tree = jshintTree('.', {
+        logError: function(message) { loggerOutput.push(message) }
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(dir) {
+
+        expect(loggerOutput[0]).to.not.match(/Missing semicolon./)
+      });
+    });
   });
 
   describe('logError', function() {

@@ -1,6 +1,7 @@
 var fs     = require('fs');
 var path   = require('path');
 var chalk  = require('chalk');
+var findup = require('findup');
 var JSHINT = require('jshint').JSHINT;
 var Filter = require('broccoli-filter');
 
@@ -11,6 +12,7 @@ function JSHinter (inputTree, options) {
 
   this.inputTree = inputTree;
   this.log       = true;
+  this.jshintrc  = this.getConfig();
 
   options = options || {};
 
@@ -72,6 +74,20 @@ JSHinter.prototype.logError = function(message, color) {
   color = color || 'red';
 
   console.log(chalk[color](message) + "\n");
+};
+
+JSHinter.prototype.getConfig = function() {
+  var jshintrcPath;
+
+  try {
+    jshintrcPath = findup.sync(process.cwd(), '.jshintrc');
+    var config = fs.readFileSync(path.join(jshintrcPath, '.jshintrc'), {encoding: 'utf8'});
+
+    return JSON.parse(config);
+  } catch(e) {
+    // do nothing, let JSHINT use defaults
+    return;
+  }
 };
 
 module.exports = JSHinter;
