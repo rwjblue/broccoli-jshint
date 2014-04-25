@@ -36,7 +36,7 @@ The function receives the following arguments:
 * `relativePath` - The relative path to the file being tested.
 * `errors` - A generated string of errors found.
 
-Default:
+Default generates QUnit style tests:
 
 ```javascript
 var path = require('path');
