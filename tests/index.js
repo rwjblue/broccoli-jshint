@@ -40,6 +40,20 @@ describe('broccoli-jshint', function(){
         expect(loggerOutput[0]).to.match(/Missing semicolon./)
       });
     });
+
+    it('does not log if `log` = false', function(){
+      var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
+      var tree = jshintTree(sourcePath, {
+        logError: function(message) { loggerOutput.push(message) },
+        log: false
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(dir) {
+
+        expect(loggerOutput.length).to.eql(0);
+      });
+    });
   });
 
   describe('testGenerator', function() {

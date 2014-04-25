@@ -28,7 +28,7 @@ JSHinter.prototype.processString = function (content, relativePath) {
   var passed = JSHINT(content, this.jshintrc);
   var errors = this.processErrors(relativePath, JSHINT.errors);
 
-  if (!passed) {
+  if (!passed && this.log) {
     this.logError(errors);
   }
 
