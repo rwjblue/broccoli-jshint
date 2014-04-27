@@ -34,19 +34,28 @@ describe('broccoli-jshint', function(){
     }
   });
 
+  describe('constructor', function() {
+    it('requires a destFile option', function() {
+      function createTree() {
+        jshintTree('.')
+      }
+      expect(createTree).to.throwException(/You must provide a destFile option/);
+    });
+  });
+
   describe('jshintrc', function() {
     it('uses the jshintrc as configuration for hinting', function(){
       var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
       chdir(sourcePath);
 
       var tree = jshintTree('.', {
+        destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) }
       });
 
       builder = new broccoli.Builder(tree);
       return builder.build().then(function(dir) {
-
-        expect(loggerOutput[0]).to.not.match(/Missing semicolon./)
+        expect(loggerOutput.join('\n')).to.not.match(/Missing semicolon./)
       });
     });
 
@@ -55,6 +64,7 @@ describe('broccoli-jshint', function(){
       chdir(sourcePath);
 
       var tree = jshintTree('.', {
+        destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) }
       });
 
@@ -69,26 +79,26 @@ describe('broccoli-jshint', function(){
     it('logs errors using custom supplied function', function(){
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var tree = jshintTree(sourcePath, {
+        destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) }
       });
 
       builder = new broccoli.Builder(tree);
       return builder.build().then(function(dir) {
-
-        expect(loggerOutput[0]).to.match(/Missing semicolon./)
+        expect(loggerOutput.join('\n')).to.match(/Missing semicolon./)
       });
     });
 
     it('does not log if `log` = false', function(){
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var tree = jshintTree(sourcePath, {
+        destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) },
         log: false
       });
 
       builder = new broccoli.Builder(tree);
       return builder.build().then(function(dir) {
-
         expect(loggerOutput.length).to.eql(0);
       });
     });
@@ -98,14 +108,15 @@ describe('broccoli-jshint', function(){
     it('generates test files for jshint errors', function(){
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var tree = jshintTree(sourcePath, {
+        destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) }
       });
 
       builder = new broccoli.Builder(tree);
       return builder.build().then(function(dir) {
-        expect(readFile(dir + '/core.jshint.js')).to.match(/Missing semicolon./)
+        expect(readFile(dir + '/jshint-tests.js')).to.match(/Missing semicolon./)
 
-        expect(readFile(dir + '/look-no-errors.jshint.js')).to.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
+        expect(readFile(dir + '/jshint-tests.js')).to.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
       });
     });
 
@@ -114,6 +125,7 @@ describe('broccoli-jshint', function(){
 
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var tree = jshintTree(sourcePath, {
+        destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) },
         escapeErrorString: function(string) {
           escapeErrorStringCalled = true;
@@ -125,22 +137,23 @@ describe('broccoli-jshint', function(){
       builder = new broccoli.Builder(tree);
       return builder.build().then(function(dir) {
         expect(escapeErrorStringCalled).to.be.ok();
-        expect(readFile(dir + '/core.jshint.js')).to.match(/blazhorz/)
+        expect(readFile(dir + '/jshint-tests.js')).to.match(/blazhorz/)
       });
     });
 
     it('does not generate tests if disableTestGenerator is set', function(){
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var tree = jshintTree(sourcePath, {
+        destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) },
         disableTestGenerator: true
       });
 
       builder = new broccoli.Builder(tree);
       return builder.build().then(function(dir) {
-        expect(readFile(dir + '/core.jshint.js')).to.not.match(/Missing semicolon./)
+        expect(readFile(dir + '/jshint-tests.js')).to.not.match(/Missing semicolon./)
 
-        expect(readFile(dir + '/look-no-errors.jshint.js')).to.not.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
+        expect(readFile(dir + '/jshint-tests.js')).to.not.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
       });
     });
   });
@@ -150,6 +163,7 @@ describe('broccoli-jshint', function(){
 
     beforeEach(function() {
       tree = jshintTree('.', {
+        destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) }
       });
     });

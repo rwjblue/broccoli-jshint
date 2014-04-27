@@ -1,20 +1,28 @@
-var fs     = require('fs');
-var path   = require('path');
-var chalk  = require('chalk');
-var findup = require('findup-sync');
-var JSHINT = require('jshint').JSHINT;
-var Filter = require('broccoli-filter');
+var fs       = require('fs');
+var path     = require('path');
+var chalk    = require('chalk');
+var findup   = require('findup-sync');
+var walkSync = require('walk-sync');
+var JSHINT   = require('jshint').JSHINT;
+var helpers  = require('broccoli-kitchen-sink-helpers');
 
-JSHinter.prototype = Object.create(Filter.prototype);
+var CachingWriter = require('broccoli-caching-writer');
+
+JSHinter.prototype = Object.create(CachingWriter.prototype);
 JSHinter.prototype.constructor = JSHinter;
 function JSHinter (inputTree, options) {
   if (!(this instanceof JSHinter)) return new JSHinter(inputTree, options);
+
+  options = options || {};
 
   this.inputTree = inputTree;
   this.log       = true;
   this.jshintrc  = this.getConfig();
 
-  options = options || {};
+  this.destFile  = options.destFile;
+  if (typeof this.destFile !== "string") {
+    throw new Error('You must provide a destFile option to broccoli-jshint.');
+  }
 
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
@@ -23,10 +31,23 @@ function JSHinter (inputTree, options) {
   }
 };
 
-JSHinter.prototype.extensions = ['js'];
-JSHinter.prototype.targetExtension = 'jshint.js';
+JSHinter.prototype.updateCache = function (srcDir, destDir) {
+  var paths    = walkSync(srcDir);
+  var length   = paths.length;
+  var contents = [];
 
-JSHinter.prototype.processString = function (content, relativePath) {
+  for (var i = 0; i < length; i++) {
+    var relativePath = paths[i];
+
+    if (relativePath.slice(-3) !== '.js') { continue; }
+    var input  = fs.readFileSync(path.join(srcDir, relativePath), {encoding: 'utf8'});
+    contents.push(this.processFile(input, relativePath));
+  }
+
+  fs.writeFileSync(path.join(destDir, this.destFile), contents.join('\n\n'));
+};
+
+JSHinter.prototype.processFile = function (content, relativePath) {
   var passed = JSHINT(content, this.jshintrc);
   var errors = this.processErrors(relativePath, JSHINT.errors);
 
@@ -67,7 +88,7 @@ JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
   return "module('JSHint - " + path.dirname(relativePath) + "');\n" +
          "test('" + relativePath + " should pass jshint', function() { \n" +
          "  ok(" + !!passed + ", '" + relativePath + " should pass jshint." + errors + "'); \n" +
-         "});"
+         "});\n"
 };
 
 JSHinter.prototype.logError = function(message, color) {
