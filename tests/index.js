@@ -71,6 +71,21 @@ describe('broccoli-jshint', function(){
       });
     });
 
+    it('can handle too many errors', function(){
+      var sourcePath = 'tests/fixtures/some-files-with-too-many-errors';
+      chdir(sourcePath);
+
+      var tree = jshintTree('.', {
+        destFile: 'jshint-tests.js',
+        logError: function(message) { loggerOutput.push(message) }
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(dir) {
+        expect(loggerOutput.join('\n')).to.match(/Too many errors./)
+      });
+    });
+
     it('can handle jshintrc if it has comments', function(){
       var sourcePath = 'tests/fixtures/comments-in-jshintrc';
       chdir(sourcePath);
