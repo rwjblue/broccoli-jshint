@@ -75,8 +75,10 @@ JSHinter.prototype.processErrors = function (file, errors) {
 
   for (idx=0; idx<len; idx++) {
     error = errors[idx];
-    str += file  + ': line ' + error.line + ', col ' +
-      error.character + ', ' + error.reason + '\n';
+    if (error !== null) {
+      str += file  + ': line ' + error.line + ', col ' +
+        error.character + ', ' + error.reason + '\n';
+    }
   }
 
   return str + "\n" + len + ' error' + ((len === 1) ? '' : 's');
