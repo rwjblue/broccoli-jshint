@@ -18,7 +18,7 @@ function JSHinter (inputTree, options) {
 
   this.inputTree = inputTree;
   this.log       = true;
-  this.jshintrc  = this.getConfig();
+  this.jshintrc  = this.getConfig(options.jshintrcRoot);
 
   this.destFile  = options.destFile;
   if (typeof this.destFile !== "string") {
@@ -103,8 +103,10 @@ JSHinter.prototype.logError = function(message, color) {
   console.log(chalk[color](message) + "\n");
 };
 
-JSHinter.prototype.getConfig = function() {
-  var jshintrcPath = findup('.jshintrc');
+JSHinter.prototype.getConfig = function(rootPath) {
+  if (!rootPath) { rootPath = process.cwd(); }
+
+  var jshintrcPath = findup('.jshintrc', {cwd: rootPath, nocase: true});
 
   if (jshintrcPath) {
     var config = fs.readFileSync(jshintrcPath, {encoding: 'utf8'});

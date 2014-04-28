@@ -27,6 +27,14 @@ The file to output the generated test output to.
 
 ---
 
+`options.jshintrcRoot` *{String}*
+
+The starting path to look for a `.jshintrc` file.
+
+Default: **`process.cwd()`**
+
+---
+
 `options.log` *{true|false}*
 
 Should we log errors to the console?
