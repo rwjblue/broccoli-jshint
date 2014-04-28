@@ -2,6 +2,7 @@ var fs       = require('fs');
 var path     = require('path');
 var chalk    = require('chalk');
 var findup   = require('findup-sync');
+var mkdirp   = require('mkdirp');
 var walkSync = require('walk-sync');
 var JSHINT   = require('jshint').JSHINT;
 var helpers  = require('broccoli-kitchen-sink-helpers');
@@ -43,6 +44,9 @@ JSHinter.prototype.updateCache = function (srcDir, destDir) {
     var input  = fs.readFileSync(path.join(srcDir, relativePath), {encoding: 'utf8'});
     contents.push(this.processFile(input, relativePath));
   }
+
+  var finalPath = path.join(destDir, this.destFile);
+  mkdirp.sync(path.dirname(finalPath));
 
   fs.writeFileSync(path.join(destDir, this.destFile), contents.join('\n\n'));
 };

@@ -34,6 +34,18 @@ describe('broccoli-jshint', function(){
     }
   });
 
+  it('can output to a non-existent path', function() {
+    var tree = jshintTree('tests/fixtures/some-files-without-semi-colons', {
+      destFile: '/some/deeply/nested/file.js',
+      logError: function(message) { loggerOutput.push(message) }
+    });
+
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(dir) {
+      expect(fs.existsSync(dir + '/some/deeply/nested/file.js')).to.be.ok();
+    });
+  });
+
   describe('constructor', function() {
     it('requires a destFile option', function() {
       function createTree() {
