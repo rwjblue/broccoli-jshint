@@ -37,12 +37,20 @@ JSHinter.prototype.updateCache = function (srcDir, destDir) {
   var length   = paths.length;
   var contents = [];
 
+  this._errors = [];
+
   for (var i = 0; i < length; i++) {
     var relativePath = paths[i];
 
     if (relativePath.slice(-3) !== '.js') { continue; }
     var input  = fs.readFileSync(path.join(srcDir, relativePath), {encoding: 'utf8'});
     contents.push(this.processFile(input, relativePath));
+  }
+
+  if (this._errors.length > 0) {
+    var label = ' JSHint Error' + (this._errors.length > 1 ? 's' : '')
+    console.log('\n' + this._errors.join('\n'));
+    console.log(chalk.yellow('===== ' + this._errors.length + label + '\n'));
   }
 
   var finalPath = path.join(destDir, this.destFile);
@@ -100,7 +108,7 @@ JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
 JSHinter.prototype.logError = function(message, color) {
   color = color || 'red';
 
-  console.log(chalk[color](message) + "\n");
+  this._errors.push(chalk[color](message) + "\n");
 };
 
 JSHinter.prototype.getConfig = function(rootPath) {
