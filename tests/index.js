@@ -41,7 +41,9 @@ describe('broccoli-jshint', function(){
     });
 
     builder = new broccoli.Builder(tree);
-    return builder.build().then(function(dir) {
+    return builder.build().then(function(results) {
+      var dir = results.directory;
+
       expect(fs.existsSync(dir + '/some/deeply/nested/file.js')).to.be.ok();
     });
   });
@@ -66,7 +68,7 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function() {
         expect(loggerOutput.join('\n')).to.not.match(/Missing semicolon./)
       });
     });
@@ -81,7 +83,7 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function() {
         expect(loggerOutput.join('\n')).to.match(/Too many errors./)
       });
     });
@@ -96,7 +98,7 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function() {
         expect(loggerOutput.length).to.eql(0);
       });
     });
@@ -111,7 +113,7 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function() {
         expect(loggerOutput.join('\n')).to.not.match(/Missing semicolon./)
       });
     });
@@ -125,7 +127,7 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function() {
         expect(loggerOutput.join('\n')).to.not.match(/Missing semicolon./)
       });
     });
@@ -140,7 +142,7 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function() {
         expect(loggerOutput.join('\n')).to.match(/Missing semicolon./)
       });
     });
@@ -154,7 +156,7 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function() {
         expect(loggerOutput.length).to.eql(0);
       });
     });
@@ -169,7 +171,9 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+
         expect(readFile(dir + '/jshint-tests.js')).to.match(/Missing semicolon./)
 
         expect(readFile(dir + '/jshint-tests.js')).to.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
@@ -191,7 +195,9 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+
         expect(escapeErrorStringCalled).to.be.ok();
         expect(readFile(dir + '/jshint-tests.js')).to.match(/blazhorz/)
       });
@@ -206,7 +212,9 @@ describe('broccoli-jshint', function(){
       });
 
       builder = new broccoli.Builder(tree);
-      return builder.build().then(function(dir) {
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+
         expect(readFile(dir + '/jshint-tests.js')).to.not.match(/Missing semicolon./)
 
         expect(readFile(dir + '/jshint-tests.js')).to.not.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
