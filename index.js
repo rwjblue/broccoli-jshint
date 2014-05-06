@@ -18,7 +18,10 @@ function JSHinter (inputTree, options) {
 
   this.inputTree = inputTree;
   this.log       = true;
-  this.jshintrc  = this.getConfig(options.jshintrcRoot);
+
+  if (options.jshintrcRoot) {
+    this.jshintrc  = this.getConfig(options.jshintrcRoot);
+  }
 
   this.destFile  = options.destFile;
   if (typeof this.destFile !== "string") {
@@ -38,6 +41,10 @@ JSHinter.prototype.updateCache = function (srcDir, destDir) {
   var contents = [];
 
   this._errors = [];
+
+  if (!this.jshintrc) {
+    this.jshintrc = this.getConfig(srcDir);
+  }
 
   for (var i = 0; i < length; i++) {
     var relativePath = paths[i];
@@ -119,7 +126,14 @@ JSHinter.prototype.getConfig = function(rootPath) {
   if (jshintrcPath) {
     var config = fs.readFileSync(jshintrcPath, {encoding: 'utf8'});
 
-    return JSON.parse(this.stripComments(config));
+    try {
+      return JSON.parse(this.stripComments(config));
+    } catch (e) {
+      console.error(chalk.red('Error occured parsing .jshintrc.'));
+      console.error(e.stack);
+
+      return null;
+    }
   }
 };
 

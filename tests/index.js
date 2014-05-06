@@ -115,6 +115,20 @@ describe('broccoli-jshint', function(){
         expect(loggerOutput.join('\n')).to.not.match(/Missing semicolon./)
       });
     });
+
+    it('can find a jshintrc in the root of the provided tree', function(){
+      var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
+
+      var tree = jshintTree(sourcePath, {
+        destFile: 'jshint-tests.js',
+        logError: function(message) { loggerOutput.push(message) }
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(dir) {
+        expect(loggerOutput.join('\n')).to.not.match(/Missing semicolon./)
+      });
+    });
   });
 
   describe('logError', function() {
