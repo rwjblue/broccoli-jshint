@@ -29,9 +29,10 @@ The file to output the generated test output to.
 
 `options.jshintrcRoot` *{String}*
 
-The starting path to look for a `.jshintrc` file.
+Will look in the root of the provided tree for a `.jshintrc`. If you would prefer to use another specific root
+for looking up your JSHint config, supply this option.
 
-Default: **`process.cwd()`**
+Default: **input tree root**
 
 ---
 
