@@ -104,10 +104,10 @@ describe('broccoli-jshint', function(){
     });
 
     it('can find a jshintrc in a specified jshintrcRoot path', function(){
-      var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
+      var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons-non-default-jshintrc-path';
 
       var tree = jshintTree(sourcePath, {
-        jshintrcRoot: sourcePath,
+        jshintrcRoot: 'blah',
         destFile: 'jshint-tests.js',
         logError: function(message) { loggerOutput.push(message) }
       });

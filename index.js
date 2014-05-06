@@ -19,10 +19,6 @@ function JSHinter (inputTree, options) {
   this.inputTree = inputTree;
   this.log       = true;
 
-  if (options.jshintrcRoot) {
-    this.jshintrc  = this.getConfig(options.jshintrcRoot);
-  }
-
   this.destFile  = options.destFile;
   if (typeof this.destFile !== "string") {
     throw new Error('You must provide a destFile option to broccoli-jshint.');
@@ -43,7 +39,7 @@ JSHinter.prototype.updateCache = function (srcDir, destDir) {
   this._errors = [];
 
   if (!this.jshintrc) {
-    this.jshintrc = this.getConfig(srcDir);
+    this.jshintrc = this.getConfig(path.join(srcDir, this.jshintrcRoot || ''));
   }
 
   for (var i = 0; i < length; i++) {
