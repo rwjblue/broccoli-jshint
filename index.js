@@ -6,10 +6,11 @@ var mkdirp   = require('mkdirp');
 var walkSync = require('walk-sync');
 var JSHINT   = require('jshint').JSHINT;
 var helpers  = require('broccoli-kitchen-sink-helpers');
+var Filter   = require('broccoli-filter');
 
-var CachingWriter = require('broccoli-caching-writer');
+var mapSeries = require('promise-map-series')
 
-JSHinter.prototype = Object.create(CachingWriter.prototype);
+JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
 function JSHinter (inputTree, options) {
   if (!(this instanceof JSHinter)) return new JSHinter(inputTree, options);
@@ -19,11 +20,6 @@ function JSHinter (inputTree, options) {
   this.inputTree = inputTree;
   this.log       = true;
 
-  this.destFile  = options.destFile;
-  if (typeof this.destFile !== "string") {
-    throw new Error('You must provide a destFile option to broccoli-jshint.');
-  }
-
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
       this[key] = options[key]
@@ -31,38 +27,43 @@ function JSHinter (inputTree, options) {
   }
 };
 
-JSHinter.prototype.updateCache = function (srcDir, destDir) {
-  var paths    = walkSync(srcDir);
-  var length   = paths.length;
-  var contents = [];
+JSHinter.prototype.extensions = ['js'];
+JSHinter.prototype.targetExtension = 'jshint.js';
 
-  this._errors = [];
+JSHinter.prototype.write = function (readTree, destDir) {
+  var self = this
+  self._errors = [];
 
-  if (!this.jshintrc) {
-    this.jshintrc = this.getConfig(path.join(srcDir, this.jshintrcRoot || ''));
-  }
+  return readTree(this.inputTree).then(function (srcDir) {
+    var paths = walkSync(srcDir)
 
-  for (var i = 0; i < length; i++) {
-    var relativePath = paths[i];
+    if (!self.jshintrc) {
+      self.jshintrc = self.getConfig(path.join(srcDir, self.jshintrcRoot || ''));
+    }
 
-    if (relativePath.slice(-3) !== '.js') { continue; }
-    var input  = fs.readFileSync(path.join(srcDir, relativePath), {encoding: 'utf8'});
-    contents.push(this.processFile(input, relativePath));
-  }
+    return mapSeries(paths, function (relativePath) {
+      if (relativePath.slice(-1) === '/') {
+        mkdirp.sync(destDir + '/' + relativePath)
+      } else {
+        if (self.canProcessFile(relativePath)) {
+          return self.processAndCacheFile(srcDir, destDir, relativePath)
+        } else {
+          helpers.copyPreserveSync(
+            srcDir + '/' + relativePath, destDir + '/' + relativePath)
+        }
+      }
+    })
+  })
+  .finally(function() {
+    if (self._errors.length > 0) {
+      var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '')
+      console.log('\n' + self._errors.join('\n'));
+      console.log(chalk.yellow('===== ' + self._errors.length + label + '\n'));
+    }
+  })
+}
 
-  if (this._errors.length > 0) {
-    var label = ' JSHint Error' + (this._errors.length > 1 ? 's' : '')
-    console.log('\n' + this._errors.join('\n'));
-    console.log(chalk.yellow('===== ' + this._errors.length + label + '\n'));
-  }
-
-  var finalPath = path.join(destDir, this.destFile);
-  mkdirp.sync(path.dirname(finalPath));
-
-  fs.writeFileSync(path.join(destDir, this.destFile), contents.join('\n\n'));
-};
-
-JSHinter.prototype.processFile = function (content, relativePath) {
+JSHinter.prototype.processString = function (content, relativePath) {
   var passed = JSHINT(content, this.jshintrc);
   var errors = this.processErrors(relativePath, JSHINT.errors);
 

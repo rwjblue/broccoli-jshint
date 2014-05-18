@@ -10,20 +10,12 @@ Run JSHint on the provided tree.
 var jshintTree = require('broccoli-jshint');
 
 // assuming someTree is a built up tree
-var tree = jshintTree(someTree, {
-  destFile: 'jshint-tests.js'
-});
+var tree = jshintTree(someTree);
 ```
 
 ## Documentation
 
 ### `jshintTree(inputTree, options)`
-
----
-
-`options.destFile` *{String}*
-
-The file to output the generated test output to.
 
 ---
 
