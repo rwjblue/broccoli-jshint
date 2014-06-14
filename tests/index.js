@@ -91,6 +91,20 @@ describe('broccoli-jshint', function(){
       });
     });
 
+    it('can find a jshintrc in a specified jshintrcPath', function(){
+      var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
+
+      var tree = jshintTree(sourcePath, {
+        jshintrcRoot: '../jshintrc-outside-project-heirarchy',
+        logError: function(message) { loggerOutput.push(message) }
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function() {
+        expect(loggerOutput.join('\n')).to.match(/Missing semicolon./)
+      });
+    });
+
     it('can find a jshintrc in the root of the provided tree', function(){
       var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
 

@@ -28,6 +28,15 @@ Default: **input tree root**
 
 ---
 
+`options.jshintrcPath` *{String}*
+
+Specify the path to the `.jshintrc` that you would like to use. Use this option if you would like to use a `.jshintrc`
+file from a path that is not in the same heirarchy as your input tree (if it is use the `.jshintrcRoot`).
+
+Default: **undefined**
+
+---
+
 `options.log` *{true|false}*
 
 Should we log errors to the console?

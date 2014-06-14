@@ -38,7 +38,8 @@ JSHinter.prototype.write = function (readTree, destDir) {
     var paths = walkSync(srcDir)
 
     if (!self.jshintrc) {
-      self.jshintrc = self.getConfig(path.join(srcDir, self.jshintrcRoot || ''));
+      var jshintPath = self.jshintrcPath || path.join(srcDir, self.jshintrcRoot || '');
+      self.jshintrc = self.getConfig(jshintPath);
     }
 
     return mapSeries(paths, function (relativePath) {
