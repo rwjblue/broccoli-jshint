@@ -1,6 +1,6 @@
 # Broccoli JSHint
 
-[![Build Status](https://travis-ci.org/rjackson/broccoli-jshint.svg?branch=master)](https://travis-ci.org/rjackson/broccoli-jshint)
+[![Build Status](https://travis-ci.org/rwjblue/broccoli-jshint.svg?branch=master)](https://travis-ci.org/rwjblue/broccoli-jshint)
 
 Run JSHint on the provided tree.
 

@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rjackson/broccoli-jshint.git"
+    "url": "https://github.com/rwjblue/broccoli-jshint.git"
   },
   "scripts": {
     "test": "mocha tests/"
