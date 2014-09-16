@@ -35,25 +35,12 @@ JSHinter.prototype.write = function (readTree, destDir) {
   self._errors = [];
 
   return readTree(this.inputTree).then(function (srcDir) {
-    var paths = walkSync(srcDir)
-
     if (!self.jshintrc) {
       var jshintPath = self.jshintrcPath || path.join(srcDir, self.jshintrcRoot || '');
       self.jshintrc = self.getConfig(jshintPath);
     }
 
-    return mapSeries(paths, function (relativePath) {
-      if (relativePath.slice(-1) === '/') {
-        mkdirp.sync(destDir + '/' + relativePath)
-      } else {
-        if (self.canProcessFile(relativePath)) {
-          return self.processAndCacheFile(srcDir, destDir, relativePath)
-        } else {
-          helpers.copyPreserveSync(
-            srcDir + '/' + relativePath, destDir + '/' + relativePath)
-        }
-      }
-    })
+    return Filter.prototype.write.call(self, readTree, destDir)
   })
   .finally(function() {
     if (self._errors.length > 0) {
