@@ -4,10 +4,7 @@ var chalk    = require('chalk');
 var findup   = require('findup-sync');
 var mkdirp   = require('mkdirp');
 var JSHINT   = require('jshint').JSHINT;
-var helpers  = require('broccoli-kitchen-sink-helpers');
 var Filter   = require('broccoli-filter');
-
-var mapSeries = require('promise-map-series')
 
 JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
