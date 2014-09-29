@@ -3,7 +3,6 @@ var path     = require('path');
 var chalk    = require('chalk');
 var findup   = require('findup-sync');
 var mkdirp   = require('mkdirp');
-var walkSync = require('walk-sync');
 var JSHINT   = require('jshint').JSHINT;
 var helpers  = require('broccoli-kitchen-sink-helpers');
 var Filter   = require('broccoli-filter');
