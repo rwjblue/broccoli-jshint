@@ -47,7 +47,7 @@ Default: **true**
 
 `options.disableTestGenerator` *{true|false}*
 
-If `true` no tests will not be generated.
+If `true` tests will not be generated.
 
 Default: **false**
 
