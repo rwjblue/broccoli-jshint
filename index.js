@@ -43,6 +43,9 @@ JSHinter.prototype.write = function (readTree, destDir) {
       var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '')
       console.log('\n' + self._errors.join('\n'));
       console.log(chalk.yellow('===== ' + self._errors.length + label + '\n'));
+      if (self.breakBuild) {
+        self.throwError(label, chalk.stripColor(self._errors.join('\n')));
+      }
     }
   })
 }
@@ -98,6 +101,13 @@ JSHinter.prototype.logError = function(message, color) {
 
   this._errors.push(chalk[color](message) + "\n");
 };
+
+JSHinter.prototype.throwError = function(message, stack) {
+  throw {
+    message: message,
+    stack: stack
+  }
+}
 
 JSHinter.prototype.getConfig = function(rootPath) {
   if (!rootPath) { rootPath = process.cwd(); }
