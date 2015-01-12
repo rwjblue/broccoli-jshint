@@ -118,6 +118,22 @@ describe('broccoli-jshint', function(){
         expect(loggerOutput.join('\n')).to.not.match(/Missing semicolon./)
       });
     });
+
+    it('can fail jshintrc if failOnAnyError is true', function(){
+      var sourcePath = 'tests/fixtures/some-files-doomed-to-be-failed';
+
+      var tree = jshintTree(sourcePath, {
+        failOnAnyError: true,
+        logError: function(message) { loggerOutput.push(message) }
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(){
+        expect().fail();
+      }, function(error) {
+        expect(error.message).to.match(/JSHint failed/);
+      });
+    });
   });
 
   describe('console', function() {
