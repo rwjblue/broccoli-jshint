@@ -119,7 +119,7 @@ describe('broccoli-jshint', function(){
       });
     });
 
-    it('can fail jshintrc if failOnAnyError is true', function(){
+    it('can fail if failOnAnyError is true', function(){
       var sourcePath = 'tests/fixtures/some-files-doomed-to-be-failed';
 
       var tree = jshintTree(sourcePath, {
