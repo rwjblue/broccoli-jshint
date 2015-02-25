@@ -74,6 +74,13 @@ function(relativePath, errors) {
          "});
 };
 ```
+---
+
+`options.console` *{Object}*
+
+Allows you to provide a custom `console` object. This is useful if you have to supress console output in CI for example.
+
+Default: **`console`**
 
 ## ZOMG!!! TESTS?!?!!?
 
