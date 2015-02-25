@@ -15,6 +15,7 @@ function JSHinter (inputTree, options) {
 
   this.inputTree = inputTree;
   this.log       = true;
+  this.console = console;
 
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
@@ -41,8 +42,8 @@ JSHinter.prototype.write = function (readTree, destDir) {
   .finally(function() {
     if (self._errors.length > 0) {
       var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '')
-      console.log('\n' + self._errors.join('\n'));
-      console.log(chalk.yellow('===== ' + self._errors.length + label + '\n'));
+      self.console.log('\n' + self._errors.join('\n'));
+      self.console.log(chalk.yellow('===== ' + self._errors.length + label + '\n'));
     }
   })
 }
@@ -110,8 +111,8 @@ JSHinter.prototype.getConfig = function(rootPath) {
     try {
       return JSON.parse(this.stripComments(config));
     } catch (e) {
-      console.error(chalk.red('Error occured parsing .jshintrc.'));
-      console.error(e.stack);
+      self.console.error(chalk.red('Error occured parsing .jshintrc.'));
+      self.console.error(e.stack);
 
       return null;
     }

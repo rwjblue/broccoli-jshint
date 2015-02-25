@@ -5,6 +5,7 @@ var jshintTree = require('..');
 var expect = require('expect.js');
 var rimraf = require('rimraf');
 var root = process.cwd();
+var chalk = require('chalk');
 
 var fs = require('fs');
 var broccoli = require('broccoli');
@@ -115,6 +116,29 @@ describe('broccoli-jshint', function(){
       builder = new broccoli.Builder(tree);
       return builder.build().then(function() {
         expect(loggerOutput.join('\n')).to.not.match(/Missing semicolon./)
+      });
+    });
+  });
+
+  describe('console', function() {
+    it('logs errors using custom supplied console', function(){
+      var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
+      var consoleLogOutput = [];
+      var tree = jshintTree(sourcePath, {
+        console: {
+          log: function(data) {
+            consoleLogOutput.push(data);
+          }
+        }
+      });
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function() {
+        var expected = [
+          '\n' + chalk.red('core.js: line 1, col 20, Missing semicolon.\n\n1 error') + '\n\n' + chalk.red('main.js: line 1, col 1, Missing semicolon.\n\n1 error') + '\n',
+          chalk.yellow('===== 2 JSHint Errors\n')
+        ]
+        expect(consoleLogOutput).to.eql(expected);
       });
     });
   });
