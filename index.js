@@ -111,8 +111,8 @@ JSHinter.prototype.getConfig = function(rootPath) {
     try {
       return JSON.parse(this.stripComments(config));
     } catch (e) {
-      self.console.error(chalk.red('Error occured parsing .jshintrc.'));
-      self.console.error(e.stack);
+      this.console.error(chalk.red('Error occured parsing .jshintrc.'));
+      this.console.error(e.stack);
 
       return null;
     }
