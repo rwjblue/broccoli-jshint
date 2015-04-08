@@ -49,7 +49,7 @@ JSHinter.prototype.write = function (readTree, destDir) {
 }
 
 JSHinter.prototype.processString = function (content, relativePath) {
-  var passed = JSHINT(content, this.jshintrc);
+  var passed = JSHINT(content, this.jshintrc, this.jshintrc.globals || {});
   var errors = this.processErrors(relativePath, JSHINT.errors);
 
   if (!passed && this.log) {
