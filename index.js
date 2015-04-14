@@ -1,17 +1,19 @@
-var fs       = require('fs');
-var path     = require('path');
-var chalk    = require('chalk');
-var findup   = require('findup-sync');
-var mkdirp   = require('mkdirp');
-var JSHINT   = require('jshint').JSHINT;
-var Filter   = require('broccoli-filter');
+var fs        = require('fs');
+var path      = require('path');
+var chalk     = require('chalk');
+var mkdirp    = require('mkdirp');
+var crypto    = require('crypto');
+var findup    = require('findup-sync');
+var stringify = require('json-stable-stringify');
+var JSHINT    = require('jshint').JSHINT;
+var Filter    = require('broccoli-persistent-filter');
 
 JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
 function JSHinter (inputTree, options) {
   if (!(this instanceof JSHinter)) return new JSHinter(inputTree, options);
 
-  options = options || {};
+  this.options = options = options || {};
 
   this.inputTree = inputTree;
   this.log       = true;
@@ -133,6 +135,21 @@ JSHinter.prototype.escapeErrorString = function(string) {
   string = string.replace(/'/gi, "\\'");
 
   return string;
+};
+
+JSHinter.prototype.baseDir = function() {
+  return __dirname;
+};
+
+JSHinter.prototype.cacheKeyProcessString = function(string, relativePath) {
+  return this.optionsHash() + crypto.createHash('md5').update(string, 'utf8').digest('hex');
+};
+
+JSHinter.prototype.optionsHash = function() {
+  if (!this._optionsHash) {
+    this._optionsHash = crypto.createHash('md5').update(stringify(this.options), 'utf8').digest('hex');
+  }
+  return this._optionsHash;
 };
 
 module.exports = JSHinter;
