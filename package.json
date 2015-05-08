@@ -18,7 +18,7 @@
     "javascript"
   ],
   "dependencies": {
-    "jshint": "~2.6.2",
+    "jshint": "^2.7.0",
     "chalk": "~0.4.0",
     "broccoli-filter": "~0.1.11",
     "findup-sync": "~0.1.3",
