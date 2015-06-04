@@ -36,7 +36,6 @@ JSHinter.prototype.write = function (readTree, destDir) {
       var jshintPath = self.jshintrcPath || path.join(srcDir, self.jshintrcRoot || '');
       self.jshintrc = self.getConfig(jshintPath);
     }
-
     return Filter.prototype.write.call(self, readTree, destDir)
   })
   .finally(function() {
@@ -50,8 +49,14 @@ JSHinter.prototype.write = function (readTree, destDir) {
 
 JSHinter.prototype.processString = function (content, relativePath) {
   var passed = JSHINT(content, this.jshintrc);
-  var errors = this.processErrors(relativePath, JSHINT.errors);
+  var errors = this.processErrors(relativePath, JSHINT.errors),
+      generalError;
 
+  if (this.failOnAnyError && errors.length > 0){
+    generalError = new Error('JSHint failed');
+    generalError.jshintErrors = errors;
+    throw generalError;
+  }
   if (!passed && this.log) {
     this.logError(errors);
   }
