@@ -36,7 +36,9 @@ JSHinter.prototype.write = function (readTree, destDir) {
       var jshintPath = self.jshintrcPath || path.join(srcDir, self.jshintrcRoot || '');
       self.jshintrc = self.getConfig(jshintPath);
     }
-    return Filter.prototype.write.call(self, readTree, destDir)
+    if (!self.disableTestGenerator) {
+      return Filter.prototype.write.call(self, readTree, destDir)
+    }
   })
   .finally(function() {
     if (self._errors.length > 0) {
