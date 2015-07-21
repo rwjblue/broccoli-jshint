@@ -8,12 +8,12 @@ var Filter   = require('broccoli-filter');
 
 JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
-function JSHinter (inputTree, options) {
-  if (!(this instanceof JSHinter)) return new JSHinter(inputTree, options);
+function JSHinter (inputNode, options) {
+  if (!(this instanceof JSHinter)) return new JSHinter(inputNode, options);
 
   options = options || {};
 
-  this.inputTree = inputTree;
+  Filter.call(this, inputNode);
   this.log       = true;
   this.console = console;
 
@@ -27,17 +27,16 @@ function JSHinter (inputTree, options) {
 JSHinter.prototype.extensions = ['js'];
 JSHinter.prototype.targetExtension = 'jshint.js';
 
-JSHinter.prototype.write = function (readTree, destDir) {
+JSHinter.prototype.build = function () {
   var self = this
   self._errors = [];
 
-  return readTree(this.inputTree).then(function (srcDir) {
-    if (!self.jshintrc) {
-      var jshintPath = self.jshintrcPath || path.join(srcDir, self.jshintrcRoot || '');
-      self.jshintrc = self.getConfig(jshintPath);
-    }
-    return Filter.prototype.write.call(self, readTree, destDir)
-  })
+  if (!self.jshintrc) {
+    var jshintPath = self.jshintrcPath || path.join(this.inputPaths[0], self.jshintrcRoot || '');
+    self.jshintrc = self.getConfig(jshintPath);
+  }
+
+  return Filter.prototype.build.call(this)
   .finally(function() {
     if (self._errors.length > 0) {
       var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '')
