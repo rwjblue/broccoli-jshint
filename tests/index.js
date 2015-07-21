@@ -19,13 +19,7 @@ describe('broccoli-jshint', function(){
     return fs.readFileSync(path, {encoding: 'utf8'});
   }
 
-  function chdir(path) {
-    process.chdir(path);
-  }
-
   beforeEach(function() {
-    chdir(root);
-
     loggerOutput = [];
   });
 
@@ -38,9 +32,8 @@ describe('broccoli-jshint', function(){
   describe('jshintrc', function() {
     it('uses the jshintrc as configuration for hinting', function(){
       var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
-      chdir(sourcePath);
 
-      var node = new JSHinter('.', {
+      var node = new JSHinter(sourcePath, {
         logError: function(message) { loggerOutput.push(message) }
       });
 
@@ -52,9 +45,8 @@ describe('broccoli-jshint', function(){
 
     it('can handle too many errors', function(){
       var sourcePath = 'tests/fixtures/some-files-with-too-many-errors';
-      chdir(sourcePath);
 
-      var node = new JSHinter('.', {
+      var node = new JSHinter(sourcePath, {
         logError: function(message) { loggerOutput.push(message) }
       });
 
@@ -66,9 +58,8 @@ describe('broccoli-jshint', function(){
 
     it('can handle jshintrc if it has comments', function(){
       var sourcePath = 'tests/fixtures/comments-in-jshintrc';
-      chdir(sourcePath);
 
-      var node = new JSHinter('.', {
+      var node = new JSHinter(sourcePath, {
         logError: function(message) { loggerOutput.push(message) }
       });
 
