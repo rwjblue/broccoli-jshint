@@ -2,36 +2,36 @@
 
 [![Build Status](https://travis-ci.org/rwjblue/broccoli-jshint.svg?branch=master)](https://travis-ci.org/rwjblue/broccoli-jshint)
 
-Run JSHint on the provided tree.
+Run JSHint on the provided node.
 
 ## Usage
 
 ```javascript
-var jshintTree = require('broccoli-jshint');
+var JSHinter = require('broccoli-jshint');
 
-// assuming someTree is a built up tree
-var tree = jshintTree(someTree);
+// Assuming someNode contains .js files
+var node = new JSHinter(someNode);
 ```
 
 ## Documentation
 
-### `jshintTree(inputTree, options)`
+### `new JSHinter(inputNode, options)`
 
 ---
 
 `options.jshintrcRoot` *{String}*
 
-Will look in the root of the provided tree for a `.jshintrc`. If you would prefer to use another specific root
+Will look in the root of the provided node for a `.jshintrc`. If you would prefer to use another specific root
 for looking up your JSHint config, supply this option.
 
-Default: **input tree root**
+Default: **input node root**
 
 ---
 
 `options.jshintrcPath` *{String}*
 
 Specify the path to the `.jshintrc` that you would like to use. Use this option if you would like to use a `.jshintrc`
-file from a path that is not in the same heirarchy as your input tree (if it is use the `.jshintrcRoot`).
+file from a path that is not in the same hierarchy as your input node (if it is use the `.jshintrcRoot`).
 
 Default: **undefined**
 
