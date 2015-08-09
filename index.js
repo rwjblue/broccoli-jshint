@@ -13,7 +13,9 @@ function JSHinter (inputNode, options) {
 
   options = options || {};
 
-  Filter.call(this, inputNode);
+  Filter.call(this, inputNode, {
+    annotation: options.annotation
+  });
   this.log       = true;
   this.console = console;
 

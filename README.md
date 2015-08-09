@@ -82,6 +82,14 @@ Allows you to provide a custom `console` object. This is useful if you have to s
 
 Default: **`console`**
 
+---
+
+`options.annotation` *{String}*
+
+A human-readable description for this plugin instance.
+
+Default: **undefined**
+
 ## ZOMG!!! TESTS?!?!!?
 
 I know, right?
