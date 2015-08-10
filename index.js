@@ -33,7 +33,6 @@ JSHinter.prototype.rebuild = function () {
   var srcDir = this.inputPath;
   self._errors = [];
 
-
   if (!self.jshintrc) {
     var jshintPath = self.jshintrcPath || path.join(srcDir, self.jshintrcRoot || '');
     self.jshintrc = self.getConfig(jshintPath);
