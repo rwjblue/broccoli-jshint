@@ -14,7 +14,9 @@ function JSHinter (inputTree, options) {
 
   options = options || {};
 
-  this.inputTree = inputTree;
+  Filter.call(this, inputNode, {
+    annotation: options.annotation
+  });
   this.log       = true;
   this.console = console;
 
@@ -94,10 +96,10 @@ JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
     errors = "";
   }
 
-  return "module('JSHint - " + path.dirname(relativePath) + "');\n" +
-         "test('" + relativePath + " should pass jshint', function() { \n" +
-         "  ok(" + !!passed + ", '" + relativePath + " should pass jshint." + errors + "'); \n" +
-         "});\n";
+  return "QUnit.module('JSHint - " + path.dirname(relativePath) + "');\n" +
+         "QUnit.test('" + relativePath + " should pass jshint', function(assert) { \n" +
+         "  assert.ok(" + !!passed + ", '" + relativePath + " should pass jshint." + errors + "'); \n" +
+         "});\n"
 };
 
 JSHinter.prototype.logError = function(message, color) {

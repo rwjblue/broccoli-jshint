@@ -1,7 +1,7 @@
 {
   "name": "broccoli-jshint",
   "version": "0.5.6",
-  "description": "Broccoli plugin run JSHint on a specific tree.",
+  "description": "Broccoli plugin to run JSHint",
   "main": "index.js",
   "author": "Robert Jackson",
   "license": "MIT",
