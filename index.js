@@ -4,51 +4,52 @@ var chalk    = require('chalk');
 var findup   = require('findup-sync');
 var mkdirp   = require('mkdirp');
 var JSHINT   = require('jshint').JSHINT;
-var Filter   = require('broccoli-filter');
+var Filter   = require('cauliflower-filter');
 
 JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
-function JSHinter (inputNode, options) {
-  if (!(this instanceof JSHinter)) return new JSHinter(inputNode, options);
+function JSHinter (inputTree, options) {
+  if (!(this instanceof JSHinter)) return new JSHinter(inputTree, options);
+  Filter.call(this, inputTree, {
+    annotation: options.annotation
+  });
 
   options = options || {};
 
-  Filter.call(this, inputNode, {
-    annotation: options.annotation
-  });
   this.log       = true;
   this.console = console;
 
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
-      this[key] = options[key]
+      this[key] = options[key];
     }
   }
-};
+}
 
 JSHinter.prototype.extensions = ['js'];
 JSHinter.prototype.targetExtension = 'jshint.js';
 
-JSHinter.prototype.build = function () {
-  var self = this
+JSHinter.prototype.rebuild = function () {
+  var self = this;
+  var srcDir = this.inputPath;
   self._errors = [];
 
   if (!self.jshintrc) {
-    var jshintPath = self.jshintrcPath || path.join(this.inputPaths[0], self.jshintrcRoot || '');
+    var jshintPath = self.jshintrcPath || path.join(this.inputPath, self.jshintrcRoot || '');
     self.jshintrc = self.getConfig(jshintPath);
   }
-
-  return Filter.prototype.build.call(this)
+  return Filter.prototype.rebuild.call(self)
   .finally(function() {
     if (self._errors.length > 0) {
-      var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '')
+      var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '');
       self.console.log('\n' + self._errors.join('\n'));
       self.console.log(chalk.yellow('===== ' + self._errors.length + label + '\n'));
     }
-  })
-}
+  });
+};
 
 JSHinter.prototype.processString = function (content, relativePath) {
+
   var passed = JSHINT(content, this.jshintrc);
   var errors = this.processErrors(relativePath, JSHINT.errors),
       generalError;
@@ -85,13 +86,13 @@ JSHinter.prototype.processErrors = function (file, errors) {
   }
 
   return str + "\n" + len + ' error' + ((len === 1) ? '' : 's');
-}
+};
 
 JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
   if (errors) {
     errors = "\\n" + this.escapeErrorString(errors);
   } else {
-    errors = ""
+    errors = "";
   }
 
   return "QUnit.module('JSHint - " + path.dirname(relativePath) + "');\n" +
