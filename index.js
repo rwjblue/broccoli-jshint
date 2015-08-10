@@ -10,13 +10,12 @@ JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
 function JSHinter (inputTree, options) {
   if (!(this instanceof JSHinter)) return new JSHinter(inputTree, options);
-  Filter.call(this, inputTree);
+  Filter.call(this, inputTree, {
+    annotation: options.annotation
+  });
 
   options = options || {};
 
-  Filter.call(this, inputNode, {
-    annotation: options.annotation
-  });
   this.log       = true;
   this.console = console;
 
@@ -36,7 +35,7 @@ JSHinter.prototype.rebuild = function () {
   self._errors = [];
 
   if (!self.jshintrc) {
-    var jshintPath = self.jshintrcPath || path.join(srcDir, self.jshintrcRoot || '');
+    var jshintPath = self.jshintrcPath || path.join(this.inputPath, self.jshintrcRoot || '');
     self.jshintrc = self.getConfig(jshintPath);
   }
   return Filter.prototype.rebuild.call(self)
