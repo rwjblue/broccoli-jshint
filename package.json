@@ -1,6 +1,6 @@
 {
   "name": "broccoli-jshint",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "Broccoli plugin to run JSHint",
   "main": "index.js",
   "author": "Robert Jackson",
