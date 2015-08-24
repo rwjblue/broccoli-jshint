@@ -157,6 +157,7 @@ JSHinter.prototype.optionsHash  = function() {
       .update(stringify(this.jshintrc) || '', 'utf8')
       .update(this.testGenerator.toString(), 'utf8')
       .update(this.logError.toString(), 'utf8')
+      .update(this.escapeErrorString.toString(), 'utf8')
       .digest('hex');
   }
 
