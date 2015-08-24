@@ -14,13 +14,14 @@ JSHinter.prototype.constructor = JSHinter;
 function JSHinter (inputNode, options) {
   if (!(this instanceof JSHinter)) return new JSHinter(inputNode, options);
 
-  this.options = options = options || {};
+  options = options || {};
 
   Filter.call(this, inputNode, {
     annotation: options.annotation,
     persist: true
   });
-  this.log       = true;
+  this.log     = true;
+  this.options = options;
   this.console = console;
 
   for (var key in options) {
@@ -154,6 +155,8 @@ JSHinter.prototype.optionsHash  = function() {
     this._optionsHash = crypto.createHash('md5')
       .update(stringify(this.options), 'utf8')
       .update(stringify(this.jshintrc) || '', 'utf8')
+      .update(this.testGenerator.toString(), 'utf8')
+      .update(this.logError.toString(), 'utf8')
       .digest('hex');
   }
 
