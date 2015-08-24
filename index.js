@@ -4,7 +4,10 @@ var chalk    = require('chalk');
 var findup   = require('findup-sync');
 var mkdirp   = require('mkdirp');
 var JSHINT   = require('jshint').JSHINT;
-var Filter   = require('broccoli-filter');
+var Filter   = require('broccoli-persistent-filter');
+var crypto   = require('crypto');
+
+var stringify = require('json-stable-stringify');
 
 JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
@@ -12,11 +15,16 @@ function JSHinter (inputNode, options) {
   if (!(this instanceof JSHinter)) return new JSHinter(inputNode, options);
 
   options = options || {};
+  if (!options.hasOwnProperty('persist')) {
+    options.persist = true;
+  }
 
   Filter.call(this, inputNode, {
-    annotation: options.annotation
+    annotation: options.annotation,
+    persist: options.persist
   });
-  this.log       = true;
+  this.log     = true;
+  this.options = options;
   this.console = console;
 
   for (var key in options) {
@@ -28,6 +36,10 @@ function JSHinter (inputNode, options) {
 
 JSHinter.prototype.extensions = ['js'];
 JSHinter.prototype.targetExtension = 'jshint.js';
+
+JSHinter.prototype.baseDir = function() {
+  return __dirname;
+};
 
 JSHinter.prototype.build = function () {
   var self = this
@@ -139,6 +151,24 @@ JSHinter.prototype.escapeErrorString = function(string) {
   string = string.replace(/'/gi, "\\'");
 
   return string;
+};
+
+JSHinter.prototype.optionsHash  = function() {
+  if (!this._optionsHash) {
+    this._optionsHash = crypto.createHash('md5')
+      .update(stringify(this.options), 'utf8')
+      .update(stringify(this.jshintrc) || '', 'utf8')
+      .update(this.testGenerator.toString(), 'utf8')
+      .update(this.logError.toString(), 'utf8')
+      .update(this.escapeErrorString.toString(), 'utf8')
+      .digest('hex');
+  }
+
+  return this._optionsHash;
+};
+
+JSHinter.prototype.cacheKeyProcessString = function(string, relativePath) {
+  return this.optionsHash() + Filter.prototype.cacheKeyProcessString.call(this, string, relativePath);
 };
 
 module.exports = JSHinter;
