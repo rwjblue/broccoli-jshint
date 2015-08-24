@@ -47,6 +47,7 @@ describe('broccoli-jshint', function(){
       var sourcePath = 'tests/fixtures/some-files-with-too-many-errors';
 
       var node = new JSHinter(sourcePath, {
+        persist: false,
         logError: function(message) { loggerOutput.push(message) }
       });
 
@@ -73,6 +74,7 @@ describe('broccoli-jshint', function(){
       var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons-non-default-jshintrc-path';
 
       var node = new JSHinter(sourcePath, {
+        persist: false,
         jshintrcRoot: 'blah',
         logError: function(message) { loggerOutput.push(message) }
       });
@@ -87,6 +89,7 @@ describe('broccoli-jshint', function(){
       var sourcePath = 'tests/fixtures/some-files-ignoring-missing-semi-colons';
 
       var node = new JSHinter(sourcePath, {
+        persist: false,
         jshintrcRoot: '../jshintrc-outside-project-heirarchy',
         logError: function(message) { loggerOutput.push(message) }
       });
@@ -132,6 +135,7 @@ describe('broccoli-jshint', function(){
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var consoleLogOutput = [];
       var node = new JSHinter(sourcePath, {
+        persist: false,
         console: {
           log: function(data) {
             consoleLogOutput.push(data);
@@ -154,6 +158,7 @@ describe('broccoli-jshint', function(){
     it('logs errors using custom supplied function', function(){
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var node = new JSHinter(sourcePath, {
+        persist: false,
         logError: function(message) { loggerOutput.push(message) }
       });
 
@@ -200,6 +205,7 @@ describe('broccoli-jshint', function(){
 
       var sourcePath = 'tests/fixtures/some-files-without-semi-colons';
       var node = new JSHinter(sourcePath, {
+        persist: false,
         logError: function(message) { loggerOutput.push(message) },
         escapeErrorString: function(string) {
           escapeErrorStringCalled = true;

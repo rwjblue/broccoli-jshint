@@ -15,10 +15,13 @@ function JSHinter (inputNode, options) {
   if (!(this instanceof JSHinter)) return new JSHinter(inputNode, options);
 
   options = options || {};
+  if (!options.hasOwnProperty('persist')) {
+    options.persist = true;
+  }
 
   Filter.call(this, inputNode, {
     annotation: options.annotation,
-    persist: true
+    persist: options.persist
   });
   this.log     = true;
   this.options = options;
