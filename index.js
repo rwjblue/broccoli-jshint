@@ -151,8 +151,12 @@ JSHinter.prototype.escapeErrorString = function(string) {
 
 JSHinter.prototype.optionsHash  = function() {
   if (!this._optionsHash) {
-    this._optionsHash = crypto.createHash('md5').update(stringify(this.options), 'utf8').digest('hex');
+    this._optionsHash = crypto.createHash('md5')
+      .update(stringify(this.options), 'utf8')
+      .update(stringify(this.jshintrc) || '', 'utf8')
+      .digest('hex');
   }
+
   return this._optionsHash;
 };
 
