@@ -108,6 +108,7 @@ JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
 
   return "QUnit.module('JSHint - " + path.dirname(relativePath) + "');\n" +
          "QUnit.test('" + relativePath + " should pass jshint', function(assert) { \n" +
+         "  assert.expect(1);\n" +
          "  assert.ok(" + !!passed + ", '" + relativePath + " should pass jshint." + errors + "'); \n" +
          "});\n"
 };
