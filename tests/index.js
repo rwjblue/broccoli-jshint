@@ -3,7 +3,6 @@
 var path = require('path');
 var JSHinter = require('..');
 var expect = require('expect.js');
-var rimraf = require('rimraf');
 var root = process.cwd();
 var chalk = require('chalk');
 
