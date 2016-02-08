@@ -28,7 +28,6 @@
   "devDependencies": {
     "mocha": "~1.18.2",
     "broccoli": "~0.13.0",
-    "expect.js": "~0.3.1",
-    "rimraf": "~2.2.6"
+    "expect.js": "~0.3.1"
   }
 }
