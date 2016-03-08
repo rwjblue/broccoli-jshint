@@ -35,7 +35,7 @@ function JSHinter (inputNode, options) {
 };
 
 JSHinter.prototype.extensions = ['js'];
-JSHinter.prototype.targetExtension = 'jshint.js';
+JSHinter.prototype.targetExtension = 'lint.js';
 
 JSHinter.prototype.baseDir = function() {
   return __dirname;
