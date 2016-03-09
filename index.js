@@ -42,7 +42,7 @@ JSHinter.prototype.baseDir = function() {
 };
 
 JSHinter.prototype.build = function () {
-  var self = this
+  var self = this;
   self._errors = [];
 
   if (!self.jshintrc) {
@@ -53,30 +53,44 @@ JSHinter.prototype.build = function () {
   return Filter.prototype.build.call(this)
   .finally(function() {
     if (self._errors.length > 0) {
-      var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '')
+      var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '');
       self.console.log('\n' + self._errors.join('\n'));
       self.console.log(chalk.yellow('===== ' + self._errors.length + label + '\n'));
     }
-  })
-}
+  });
+};
 
 JSHinter.prototype.processString = function (content, relativePath) {
   var passed = JSHINT(content, this.jshintrc);
-  var errors = this.processErrors(relativePath, JSHINT.errors),
-      generalError;
+  var errors = this.processErrors(relativePath, JSHINT.errors);
+
+  var output = '';
+  if (!this.disableTestGenerator) {
+    output = this.testGenerator(relativePath, passed, errors);
+  }
+
+  return {
+    output: output,
+    passed: passed,
+    errors: errors
+  };
+};
+
+JSHinter.prototype.postProcess = function(results) {
+  var errors = results.errors;
+  var passed = results.passed;
 
   if (this.failOnAnyError && errors.length > 0){
     generalError = new Error('JSHint failed');
     generalError.jshintErrors = errors;
     throw generalError;
   }
+
   if (!passed && this.log) {
     this.logError(errors);
   }
 
-  if (!this.disableTestGenerator) {
-    return this.testGenerator(relativePath, passed, errors);
-  }
+  return results;
 };
 
 JSHinter.prototype.processErrors = function (file, errors) {
@@ -97,20 +111,21 @@ JSHinter.prototype.processErrors = function (file, errors) {
   }
 
   return str + "\n" + len + ' error' + ((len === 1) ? '' : 's');
-}
+};
 
 JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
   if (errors) {
     errors = "\\n" + this.escapeErrorString(errors);
   } else {
-    errors = ""
+    errors = "";
   }
 
-  return "QUnit.module('JSHint - " + path.dirname(relativePath) + "');\n" +
-         "QUnit.test('" + relativePath + " should pass jshint', function(assert) { \n" +
-         "  assert.expect(1);\n" +
-         "  assert.ok(" + !!passed + ", '" + relativePath + " should pass jshint." + errors + "'); \n" +
-         "});\n"
+  return "" +
+    "QUnit.module('JSHint - " + path.dirname(relativePath) + "');\n" +
+    "QUnit.test('" + relativePath + " should pass jshint', function(assert) { \n" +
+    "  assert.expect(1);\n" +
+    "  assert.ok(" + !!passed + ", '" + relativePath + " should pass jshint." + errors + "'); \n" +
+    "});\n";
 };
 
 JSHinter.prototype.logError = function(message, color) {
