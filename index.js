@@ -15,9 +15,7 @@ var minimatch = require('minimatch');
 JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
 function JSHinter (inputNode, options) {
-  if (!(this instanceof JSHinter)) {
-    return new JSHinter(inputNode, options);
-  }
+  if (!(this instanceof JSHinter)) return new JSHinter(inputNode, options);
 
   options = options || {};
   if (!options.hasOwnProperty('persist')) {
@@ -42,19 +40,11 @@ function JSHinter (inputNode, options) {
 JSHinter.prototype.extensions = ['js'];
 JSHinter.prototype.targetExtension = 'lint.js';
 
-JSHinter.prototype.baseDir = function () {
+JSHinter.prototype.baseDir = function() {
   return __dirname;
 };
 
-JSHinter.prototype.processIgnoredFiles = function () {
-  var funnel = Remove(this.outputPath, {
-    paths: this.ignoredFiles || []
-  });
-  var builder = new broccoli.Builder(funnel);
-  return builder.build();
-};
-
-JSHinter.prototype.build = function () {
+JSHinter.prototype.build = function() {
   var self = this;
   self._errors = [];
 
@@ -70,7 +60,7 @@ JSHinter.prototype.build = function () {
   }
 
   return Filter.prototype.build.call(this)
-  .finally(function () {
+  .finally(function() {
     if (self._errors.length > 0) {
       var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '');
       self.console.log('\n' + self._errors.join('\n'));
@@ -79,7 +69,7 @@ JSHinter.prototype.build = function () {
   });
 };
 
-JSHinter.prototype.processString = function (content, relativePath) {
+JSHinter.prototype.processString = function(content, relativePath) {
   var passed = JSHINT(content, this.jshintrc);
   var errors = this.processErrors(relativePath, JSHINT.errors);
 
@@ -95,7 +85,7 @@ JSHinter.prototype.processString = function (content, relativePath) {
   };
 };
 
-JSHinter.prototype.postProcess = function (results) {
+JSHinter.prototype.postProcess = function(results) {
   var errors = results.errors;
   var passed = results.passed;
 
@@ -112,7 +102,7 @@ JSHinter.prototype.postProcess = function (results) {
   return results;
 };
 
-JSHinter.prototype.processErrors = function (file, errors) {
+JSHinter.prototype.processErrors = function(file, errors) {
   if (!errors) { return ''; }
 
   var len = errors.length,
@@ -132,7 +122,7 @@ JSHinter.prototype.processErrors = function (file, errors) {
   return str + "\n" + len + ' error' + ((len === 1) ? '' : 's');
 };
 
-JSHinter.prototype.testGenerator = function (relativePath, passed, errors) {
+JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
   if (errors) {
     errors = "\\n" + this.escapeErrorString(errors);
   } else {
@@ -147,13 +137,13 @@ JSHinter.prototype.testGenerator = function (relativePath, passed, errors) {
     "});\n";
 };
 
-JSHinter.prototype.logError = function (message, color) {
+JSHinter.prototype.logError = function(message, color) {
   color = color || 'red';
 
   this._errors.push(chalk[color](message) + "\n");
 };
 
-JSHinter.prototype.getConfig = function (rootPath) {
+JSHinter.prototype.getConfig = function(rootPath) {
   if (!rootPath) { rootPath = process.cwd(); }
 
   var jshintrcPath = findup('.jshintrc', {cwd: rootPath, nocase: true});
@@ -172,7 +162,7 @@ JSHinter.prototype.getConfig = function (rootPath) {
   }
 };
 
-JSHinter.prototype.stripComments = function (string) {
+JSHinter.prototype.stripComments = function(string) {
   string = string || "";
 
   string = string.replace(/\/\*(?:(?!\*\/)[\s\S])*\*\//g, "");
@@ -181,14 +171,14 @@ JSHinter.prototype.stripComments = function (string) {
   return string;
 };
 
-JSHinter.prototype.escapeErrorString = function (string) {
+JSHinter.prototype.escapeErrorString = function(string) {
   string = string.replace(/\n/gi, "\\n");
   string = string.replace(/'/gi, "\\'");
 
   return string;
 };
 
-JSHinter.prototype.optionsHash  = function () {
+JSHinter.prototype.optionsHash  = function() {
   if (!this._optionsHash) {
     this._optionsHash = crypto.createHash('md5')
       .update(stringify(this.options), 'utf8')
@@ -202,11 +192,11 @@ JSHinter.prototype.optionsHash  = function () {
   return this._optionsHash;
 };
 
-JSHinter.prototype.cacheKeyProcessString = function (string, relativePath) {
+JSHinter.prototype.cacheKeyProcessString = function(string, relativePath) {
   return this.optionsHash() + Filter.prototype.cacheKeyProcessString.call(this, string, relativePath);
 };
 
-JSHinter.prototype.getIgnoredFiles = function (rootPath) {
+JSHinter.prototype.getIgnoredFiles = function(rootPath) {
   if (!rootPath) { rootPath = process.cwd(); }
 
   var jshintignorePath = findup('.jshintignore', {cwd: rootPath, nocase: true});
@@ -225,28 +215,28 @@ JSHinter.prototype.getIgnoredFiles = function (rootPath) {
   }
 };
 
-JSHinter.prototype.getIgnoredFilesMatcher = function () {
-  var expressions = this.ignoredFiles.map(function (pattern) {
+JSHinter.prototype.getIgnoredFilesMatcher = function() {
+  var expressions = this.ignoredFiles.map(function(pattern) {
     return minimatch.makeRe(pattern).source;
   }).join('|');
   return new RegExp(expressions);
 };
 
-JSHinter.prototype.getFilePaths = function (config) {
+JSHinter.prototype.getFilePaths = function(config) {
   if (!config) {
     return [];
   }
 
   return config.split('\n')
-    .filter(function (line) {
+    .filter(function(line) {
       return !!line.trim();
     })
-    .map(function (line) {
+    .map(function(line) {
       return line.trim();
     });
 };
 
-JSHinter.prototype.getDestFilePath = function (path) {
+JSHinter.prototype.getDestFilePath = function(path) {
   var destFile = Filter.prototype.getDestFilePath.call(this, path);
   if (this.ignoredFiles && this.ignoredFilesMatcher) {
     var didMatch = this.ignoredFilesMatcher.test(path);
