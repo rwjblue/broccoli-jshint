@@ -1,3 +1,5 @@
+/* jshint node: true */
+
 var fs       = require('fs');
 var path     = require('path');
 var chalk    = require('chalk');
@@ -8,6 +10,7 @@ var Filter   = require('broccoli-persistent-filter');
 var crypto   = require('crypto');
 
 var stringify = require('json-stable-stringify');
+var minimatch = require('minimatch');
 
 JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
@@ -29,10 +32,10 @@ function JSHinter (inputNode, options) {
 
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
-      this[key] = options[key]
+      this[key] = options[key];
     }
   }
-};
+}
 
 JSHinter.prototype.extensions = ['js'];
 JSHinter.prototype.targetExtension = 'lint.js';
@@ -41,13 +44,19 @@ JSHinter.prototype.baseDir = function() {
   return __dirname;
 };
 
-JSHinter.prototype.build = function () {
+JSHinter.prototype.build = function() {
   var self = this;
   self._errors = [];
 
   if (!self.jshintrc) {
     var jshintPath = self.jshintrcPath || path.join(this.inputPaths[0], self.jshintrcRoot || '');
     self.jshintrc = self.getConfig(jshintPath);
+  }
+
+  if (!self.ignoredFiles) {
+    var jshintignorePath = self.jshintignorePath || path.join(this.inputPaths[0], self.jshintrcRoot || '');
+    self.ignoredFiles = self.getIgnoredFiles(jshintignorePath);
+    self.ignoredFilesMatcher = !!self.ignoredFiles ? self.getIgnoredFilesMatcher() : null;
   }
 
   return Filter.prototype.build.call(this)
@@ -60,7 +69,7 @@ JSHinter.prototype.build = function () {
   });
 };
 
-JSHinter.prototype.processString = function (content, relativePath) {
+JSHinter.prototype.processString = function(content, relativePath) {
   var passed = JSHINT(content, this.jshintrc);
   var errors = this.processErrors(relativePath, JSHINT.errors);
 
@@ -93,7 +102,7 @@ JSHinter.prototype.postProcess = function(results) {
   return results;
 };
 
-JSHinter.prototype.processErrors = function (file, errors) {
+JSHinter.prototype.processErrors = function(file, errors) {
   if (!errors) { return ''; }
 
   var len = errors.length,
@@ -185,6 +194,55 @@ JSHinter.prototype.optionsHash  = function() {
 
 JSHinter.prototype.cacheKeyProcessString = function(string, relativePath) {
   return this.optionsHash() + Filter.prototype.cacheKeyProcessString.call(this, string, relativePath);
+};
+
+JSHinter.prototype.getIgnoredFiles = function(rootPath) {
+  if (!rootPath) { rootPath = process.cwd(); }
+
+  var jshintignorePath = findup('.jshintignore', {cwd: rootPath, nocase: true});
+
+  if (jshintignorePath) {
+    var config = fs.readFileSync(jshintignorePath, {encoding: 'utf8'});
+
+    try {
+      return this.getFilePaths(config);
+    } catch (e) {
+      this.console.error(chalk.red('Error occurred parsing .jshintignore'));
+      this.console.error(e.stack);
+
+      return null;
+    }
+  }
+};
+
+JSHinter.prototype.getIgnoredFilesMatcher = function() {
+  var expressions = this.ignoredFiles.map(function(pattern) {
+    return minimatch.makeRe(pattern).source;
+  }).join('|');
+  return new RegExp(expressions);
+};
+
+JSHinter.prototype.getFilePaths = function(config) {
+  if (!config) {
+    return [];
+  }
+
+  return config.split('\n')
+    .filter(function(line) {
+      return !!line.trim();
+    })
+    .map(function(line) {
+      return line.trim();
+    });
+};
+
+JSHinter.prototype.getDestFilePath = function(path) {
+  var destFile = Filter.prototype.getDestFilePath.call(this, path);
+  if (this.ignoredFiles && this.ignoredFilesMatcher) {
+    var didMatch = this.ignoredFilesMatcher.test(path);
+    return didMatch ? null : destFile;
+  }
+  return destFile;
 };
 
 module.exports = JSHinter;

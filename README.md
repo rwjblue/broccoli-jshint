@@ -37,6 +37,13 @@ Default: **undefined**
 
 ---
 
+`options.jshintignorePath` *{String}*
+
+Specify the path to the `.jshintignore` that you would like to use. Use this option if you would like to use a `.jshintignore`
+file from a path that is not in the same hierarchy as your input node (if it is use the `.jshintrcRoot`).
+
+---
+
 `options.log` *{true|false}*
 
 Should we log errors to the console?
