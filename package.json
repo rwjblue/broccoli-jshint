@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "Robert Jackson",
   "license": "MIT",
+  "files": [
+    "index.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/rwjblue/broccoli-jshint.git"
