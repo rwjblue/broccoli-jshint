@@ -68,10 +68,10 @@ Default generates QUnit style tests:
 var path = require('path');
 
 function(relativePath, errors) {
-  return "module('" + path.dirname(relativePath) + '");";
+  return "module('" + path.dirname(relativePath) + "');";
          "test('" + relativePath + "' should pass jshint', function() { " +
          "  ok(passed, moduleName+" should pass jshint."+(errors ? "\n"+errors : '')); " +
-         "});
+         "});"
 };
 ```
 ---
