@@ -81,7 +81,7 @@ JSHinter.prototype.postProcess = function(results) {
   var passed = results.passed;
 
   if (this.failOnAnyError && errors.length > 0){
-    generalError = new Error('JSHint failed');
+    var generalError = new Error('JSHint failed');
     generalError.jshintErrors = errors;
     throw generalError;
   }
