@@ -1,7 +1,7 @@
 var fs       = require('fs');
 var path     = require('path');
 var chalk    = require('chalk');
-var findup   = require('findup-sync');
+var findUp   = require('find-up');
 var mkdirp   = require('mkdirp');
 var JSHINT   = require('jshint').JSHINT;
 var Filter   = require('broccoli-persistent-filter');
@@ -32,7 +32,7 @@ function JSHinter (inputNode, options) {
       this[key] = options[key]
     }
   }
-};
+}
 
 JSHinter.prototype.extensions = ['js'];
 JSHinter.prototype.targetExtension = 'lint.js';
@@ -81,7 +81,7 @@ JSHinter.prototype.postProcess = function(results) {
   var passed = results.passed;
 
   if (this.failOnAnyError && errors.length > 0){
-    generalError = new Error('JSHint failed');
+    var generalError = new Error('JSHint failed');
     generalError.jshintErrors = errors;
     throw generalError;
   }
@@ -137,7 +137,7 @@ JSHinter.prototype.logError = function(message, color) {
 JSHinter.prototype.getConfig = function(rootPath) {
   if (!rootPath) { rootPath = process.cwd(); }
 
-  var jshintrcPath = findup('.jshintrc', {cwd: rootPath, nocase: true});
+  var jshintrcPath = findUp.sync('.jshintrc', {cwd: rootPath});
 
   if (jshintrcPath) {
     var config = fs.readFileSync(jshintrcPath, {encoding: 'utf8'});

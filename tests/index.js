@@ -2,7 +2,7 @@
 
 var path = require('path');
 var JSHinter = require('..');
-var expect = require('expect.js');
+var expect = require('chai').expect;
 var root = process.cwd();
 var chalk = require('chalk');
 
@@ -217,7 +217,7 @@ describe('broccoli-jshint', function(){
       return builder.build().then(function(results) {
         var dir = results.directory;
 
-        expect(escapeErrorStringCalled).to.be.ok();
+        expect(escapeErrorStringCalled).to.be.ok;
         expect(readFile(dir + '/core.lint.js')).to.match(/blazhorz/)
       });
     });
