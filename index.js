@@ -32,7 +32,7 @@ function JSHinter (inputNode, options) {
       this[key] = options[key]
     }
   }
-};
+}
 
 JSHinter.prototype.extensions = ['js'];
 JSHinter.prototype.targetExtension = 'lint.js';
