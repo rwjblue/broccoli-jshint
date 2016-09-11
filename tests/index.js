@@ -145,7 +145,7 @@ describe('broccoli-jshint', function(){
       builder = new broccoli.Builder(node);
       return builder.build().then(function() {
         var expected = [
-          '\n' + chalk.red('core.js: line 1, col 20, Missing semicolon.\n\n1 error') + '\n\n' + chalk.red('main.js: line 1, col 1, Missing semicolon.\n\n1 error') + '\n',
+          '\n' + chalk.red('core.js: line 1, col 20, Missing semicolon.\n\n1 error') + '\n\n' + chalk.red('main.js: line 1, col 10, Missing semicolon.\n\n1 error') + '\n',
           chalk.yellow('===== 2 JSHint Errors\n')
         ]
         expect(consoleLogOutput).to.eql(expected);
@@ -193,9 +193,9 @@ describe('broccoli-jshint', function(){
       return builder.build().then(function(results) {
         var dir = results.directory;
 
-        expect(readFile(dir + '/core.lint.js')).to.match(/Missing semicolon./)
+        expect(readFile(dir + '/core.lint-test.js')).to.match(/Missing semicolon./)
 
-        expect(readFile(dir + '/look-no-errors.lint.js')).to.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
+        expect(readFile(dir + '/look-no-errors.lint-test.js')).to.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
       });
     });
 
@@ -218,7 +218,7 @@ describe('broccoli-jshint', function(){
         var dir = results.directory;
 
         expect(escapeErrorStringCalled).to.be.ok;
-        expect(readFile(dir + '/core.lint.js')).to.match(/blazhorz/)
+        expect(readFile(dir + '/core.lint-test.js')).to.match(/blazhorz/)
       });
     });
 
@@ -234,9 +234,9 @@ describe('broccoli-jshint', function(){
       return builder.build().then(function(results) {
         var dir = results.directory;
 
-        expect(readFile(dir + '/core.lint.js')).to.not.match(/Missing semicolon./)
+        expect(readFile(dir + '/core.lint-test.js')).to.not.match(/Missing semicolon./)
 
-        expect(readFile(dir + '/look-no-errors.lint.js')).to.not.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
+        expect(readFile(dir + '/look-no-errors.lint-test.js')).to.not.match(/ok\(true, 'look-no-errors.js should pass jshint.'\);/)
       });
     });
   });
