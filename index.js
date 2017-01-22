@@ -61,7 +61,11 @@ JSHinter.prototype.build = function () {
 };
 
 JSHinter.prototype.processString = function (content, relativePath) {
-  var passed = JSHINT(content, this.jshintrc);
+
+  var globals = this.jshintrc.globals;
+  delete(this.jshintrc.globals);
+
+  var passed = JSHINT(content, this.jshintrc, globals);
   var errors = this.processErrors(relativePath, JSHINT.errors);
 
   var output = '';
