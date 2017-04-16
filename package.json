@@ -17,6 +17,7 @@
   },
   "keywords": [
     "broccoli-plugin",
+    "ember-addon",
     "jshint",
     "javascript"
   ],
