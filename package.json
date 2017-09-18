@@ -1,10 +1,13 @@
 {
   "name": "broccoli-jshint",
-  "version": "0.5.5",
-  "description": "Broccoli plugin run JSHint on a specific tree.",
+  "version": "2.1.0",
+  "description": "Broccoli plugin to run JSHint",
   "main": "index.js",
   "author": "Robert Jackson",
   "license": "MIT",
+  "files": [
+    "index.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/rwjblue/broccoli-jshint.git"
@@ -18,16 +21,16 @@
     "javascript"
   ],
   "dependencies": {
-    "jshint": "~2.6.2",
-    "chalk": "~0.4.0",
-    "broccoli-filter": "~0.1.11",
-    "findup-sync": "~0.1.3",
-    "mkdirp": "~0.4.0"
+    "broccoli-persistent-filter": "^1.2.0",
+    "chalk": "^1.1.3",
+    "find-up": "^1.1.2",
+    "jshint": "^2.9.2",
+    "json-stable-stringify": "^1.0.0",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
-    "mocha": "~1.18.2",
-    "broccoli": "~0.13.0",
-    "expect.js": "~0.3.1",
-    "rimraf": "~2.2.6"
+    "broccoli": "^0.16.9",
+    "chai": "^3.5.0",
+    "mocha": "^3.0.0"
   }
 }

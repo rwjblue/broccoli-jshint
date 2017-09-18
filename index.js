@@ -1,20 +1,30 @@
 var fs       = require('fs');
 var path     = require('path');
 var chalk    = require('chalk');
-var findup   = require('findup-sync');
+var findUp   = require('find-up');
 var mkdirp   = require('mkdirp');
 var JSHINT   = require('jshint').JSHINT;
-var Filter   = require('broccoli-filter');
+var Filter   = require('broccoli-persistent-filter');
+var crypto   = require('crypto');
+
+var stringify = require('json-stable-stringify');
 
 JSHinter.prototype = Object.create(Filter.prototype);
 JSHinter.prototype.constructor = JSHinter;
-function JSHinter (inputTree, options) {
-  if (!(this instanceof JSHinter)) return new JSHinter(inputTree, options);
+function JSHinter (inputNode, options) {
+  if (!(this instanceof JSHinter)) return new JSHinter(inputNode, options);
 
   options = options || {};
+  if (!options.hasOwnProperty('persist')) {
+    options.persist = true;
+  }
 
-  this.inputTree = inputTree;
-  this.log       = true;
+  Filter.call(this, inputNode, {
+    annotation: options.annotation,
+    persist: options.persist
+  });
+  this.log     = true;
+  this.options = options;
   this.console = console;
 
   for (var key in options) {
@@ -22,43 +32,65 @@ function JSHinter (inputTree, options) {
       this[key] = options[key]
     }
   }
-};
+}
 
 JSHinter.prototype.extensions = ['js'];
-JSHinter.prototype.targetExtension = 'jshint.js';
+JSHinter.prototype.targetExtension = 'lint.js';
 
-JSHinter.prototype.write = function (readTree, destDir) {
-  var self = this
+JSHinter.prototype.baseDir = function() {
+  return __dirname;
+};
+
+JSHinter.prototype.build = function () {
+  var self = this;
   self._errors = [];
 
-  return readTree(this.inputTree).then(function (srcDir) {
-    if (!self.jshintrc) {
-      var jshintPath = self.jshintrcPath || path.join(srcDir, self.jshintrcRoot || '');
-      self.jshintrc = self.getConfig(jshintPath);
-    }
+  if (!self.jshintrc) {
+    var jshintPath = self.jshintrcPath || path.join(this.inputPaths[0], self.jshintrcRoot || '');
+    self.jshintrc = self.getConfig(jshintPath);
+  }
 
-    return Filter.prototype.write.call(self, readTree, destDir)
-  })
+  return Filter.prototype.build.call(this)
   .finally(function() {
     if (self._errors.length > 0) {
-      var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '')
+      var label = ' JSHint Error' + (self._errors.length > 1 ? 's' : '');
       self.console.log('\n' + self._errors.join('\n'));
       self.console.log(chalk.yellow('===== ' + self._errors.length + label + '\n'));
     }
-  })
-}
+  });
+};
 
 JSHinter.prototype.processString = function (content, relativePath) {
   var passed = JSHINT(content, this.jshintrc, this.jshintrc.globals || {});
   var errors = this.processErrors(relativePath, JSHINT.errors);
 
+  var output = '';
+  if (!this.disableTestGenerator) {
+    output = this.testGenerator(relativePath, passed, errors);
+  }
+
+  return {
+    output: output,
+    passed: passed,
+    errors: errors
+  };
+};
+
+JSHinter.prototype.postProcess = function(results) {
+  var errors = results.errors;
+  var passed = results.passed;
+
+  if (this.failOnAnyError && errors.length > 0){
+    var generalError = new Error('JSHint failed');
+    generalError.jshintErrors = errors;
+    throw generalError;
+  }
+
   if (!passed && this.log) {
     this.logError(errors);
   }
 
-  if (!this.disableTestGenerator) {
-    return this.testGenerator(relativePath, passed, errors);
-  }
+  return results;
 };
 
 JSHinter.prototype.processErrors = function (file, errors) {
@@ -79,19 +111,21 @@ JSHinter.prototype.processErrors = function (file, errors) {
   }
 
   return str + "\n" + len + ' error' + ((len === 1) ? '' : 's');
-}
+};
 
 JSHinter.prototype.testGenerator = function(relativePath, passed, errors) {
   if (errors) {
     errors = "\\n" + this.escapeErrorString(errors);
   } else {
-    errors = ""
+    errors = "";
   }
 
-  return "module('JSHint - " + path.dirname(relativePath) + "');\n" +
-         "test('" + relativePath + " should pass jshint', function() { \n" +
-         "  ok(" + !!passed + ", '" + relativePath + " should pass jshint." + errors + "'); \n" +
-         "});\n"
+  return "" +
+    "QUnit.module('JSHint - " + path.dirname(relativePath) + "');\n" +
+    "QUnit.test('" + relativePath + " should pass jshint', function(assert) { \n" +
+    "  assert.expect(1);\n" +
+    "  assert.ok(" + !!passed + ", '" + relativePath + " should pass jshint." + errors + "'); \n" +
+    "});\n";
 };
 
 JSHinter.prototype.logError = function(message, color) {
@@ -103,7 +137,7 @@ JSHinter.prototype.logError = function(message, color) {
 JSHinter.prototype.getConfig = function(rootPath) {
   if (!rootPath) { rootPath = process.cwd(); }
 
-  var jshintrcPath = findup('.jshintrc', {cwd: rootPath, nocase: true});
+  var jshintrcPath = findUp.sync('.jshintrc', {cwd: rootPath});
 
   if (jshintrcPath) {
     var config = fs.readFileSync(jshintrcPath, {encoding: 'utf8'});
@@ -133,6 +167,24 @@ JSHinter.prototype.escapeErrorString = function(string) {
   string = string.replace(/'/gi, "\\'");
 
   return string;
+};
+
+JSHinter.prototype.optionsHash  = function() {
+  if (!this._optionsHash) {
+    this._optionsHash = crypto.createHash('md5')
+      .update(stringify(this.options), 'utf8')
+      .update(stringify(this.jshintrc) || '', 'utf8')
+      .update(this.testGenerator.toString(), 'utf8')
+      .update(this.logError.toString(), 'utf8')
+      .update(this.escapeErrorString.toString(), 'utf8')
+      .digest('hex');
+  }
+
+  return this._optionsHash;
+};
+
+JSHinter.prototype.cacheKeyProcessString = function(string, relativePath) {
+  return this.optionsHash() + Filter.prototype.cacheKeyProcessString.call(this, string, relativePath);
 };
 
 module.exports = JSHinter;
