@@ -80,14 +80,14 @@ JSHinter.prototype.postProcess = function(results) {
   var errors = results.errors;
   var passed = results.passed;
 
+  if (!passed && this.log) {
+    this.logError(errors);
+  }
+
   if (this.failOnAnyError && errors.length > 0){
     var generalError = new Error('JSHint failed');
     generalError.jshintErrors = errors;
     throw generalError;
-  }
-
-  if (!passed && this.log) {
-    this.logError(errors);
   }
 
   return results;
